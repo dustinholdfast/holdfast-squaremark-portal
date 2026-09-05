@@ -75,3 +75,23 @@ export async function saveEngagement(
   writeLocal(next)
   return { ok: true, engagement: next }
 }
+
+export async function verifyAdminPin(adminPin: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const res = await fetch('/api/state', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-pin': adminPin,
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({}),
+    })
+    if (res.ok) return { ok: true }
+    if (res.status === 401) return { ok: false, error: 'Incorrect PIN.' }
+    return { ok: false, error: `Unlock failed (${res.status})` }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Network error' }
+  }
+}
+

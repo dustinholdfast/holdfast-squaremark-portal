@@ -8,7 +8,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "ENGAGEMENT_DB"
 database_name = "squaremark-portal"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "9956cae0-c941-4ba3-8e20-875881c4e211"
 
 # Optional KV fallback (bind as ENGAGEMENT_STATE).
 # [[kv_namespaces]]

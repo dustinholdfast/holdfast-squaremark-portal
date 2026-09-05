@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { loadEngagement, saveEngagement } from './api'
+import { loadEngagement, saveEngagement, verifyAdminPin } from './api'
 import { computeProgress, needsFromYou } from './progress'
-import { DEFAULT_ADMIN_PIN_HINT } from './seed'
 import type {
   Engagement,
   EvidenceStatus,
@@ -138,16 +137,27 @@ export default function App() {
     [adminPin, source],
   )
 
-  function tryUnlock() {
-    const expected =
-      import.meta.env.VITE_ADMIN_PIN || DEFAULT_ADMIN_PIN_HINT
-    if (pinInput === expected) {
-      setAdmin(true)
-      setAdminPin(pinInput)
-      setSaveMsg(null)
-    } else {
-      setSaveMsg('Incorrect PIN.')
+  async function tryUnlock() {
+    const pin = pinInput.trim()
+    if (!pin) {
+      setSaveMsg('Enter your admin PIN.')
+      return
     }
+    setSaving(true)
+    setSaveMsg(null)
+    if (source === 'api') {
+      const result = await verifyAdminPin(pin)
+      setSaving(false)
+      if (!result.ok) {
+        setSaveMsg(result.error || 'Incorrect PIN.')
+        return
+      }
+    } else {
+      setSaving(false)
+    }
+    setAdmin(true)
+    setAdminPin(pin)
+    setSaveMsg(null)
   }
 
   async function postUpdate() {
@@ -234,10 +244,11 @@ export default function App() {
             />
             <button
               type="button"
-              className="rounded border border-brass/50 bg-brass/15 px-3 py-1.5 text-sm text-brass hover:bg-brass/25"
+              className="rounded border border-brass/50 bg-brass/15 px-3 py-1.5 text-sm text-brass hover:bg-brass/25 disabled:opacity-50"
               onClick={tryUnlock}
+              disabled={saving || !pinInput.trim()}
             >
-              Unlock admin
+              {saving ? 'Checking…' : 'Unlock admin'}
             </button>
             {saveMsg && <span className="text-xs text-miss">{saveMsg}</span>}
           </>
