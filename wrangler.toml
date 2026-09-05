@@ -1,0 +1,16 @@
+name = "holdfast-squaremark-portal"
+compatibility_date = "2026-09-05"
+pages_build_output_dir = "dist"
+
+# Production needs D1 (preferred) or KV so Tommy and Dustin share state.
+# Create D1: npx wrangler d1 create squaremark-portal
+# Then replace database_id below.
+[[d1_databases]]
+binding = "ENGAGEMENT_DB"
+database_name = "squaremark-portal"
+database_id = "REPLACE_WITH_D1_ID"
+
+# Optional KV fallback (bind as ENGAGEMENT_STATE).
+# [[kv_namespaces]]
+# binding = "ENGAGEMENT_STATE"
+# id = "REPLACE_WITH_KV_ID"
